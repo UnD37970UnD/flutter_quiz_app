@@ -1,6 +1,6 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
+import './quiz.dart';
+import './results.dart';
 
 void main() => runApp(QuizApp());
 
@@ -13,8 +13,18 @@ class QuizApp extends StatefulWidget {
 
 class _QuizAppState extends State<QuizApp> {
   int _questionIndex = 0;
+  int score = 0;
 
-  void _answerQuestion() {
+  void _resetQuiz() {
+    setState(() {
+      _questionIndex = 0;
+      score = 0;
+    });
+  }
+
+  void _answerQuestion(int score) {
+    this.score += score;
+    print(this.score);
     setState(() {
       _questionIndex += 1;
     });
@@ -22,7 +32,7 @@ class _QuizAppState extends State<QuizApp> {
 
   @override
   Widget build(BuildContext context) {
-    final questions = const [
+    final _questions = const [
       {
         'questionText': 'What\'s your favorite color?',
         'answers': [
@@ -42,12 +52,12 @@ class _QuizAppState extends State<QuizApp> {
         ],
       },
       {
-        'questionText': 'Who\'s your favorite instructor?',
+        'questionText': 'Who\'s your favorite friend?',
         'answers': [
-          {'text': 'Max', 'score': 1},
-          {'text': 'Max', 'score': 1},
-          {'text': 'Max', 'score': 1},
-          {'text': 'Max', 'score': 1},
+          {'text': 'Iustin', 'score': 2},
+          {'text': 'Me', 'score': 1},
+          {'text': 'The quiz creator', 'score': 1},
+          {'text': 'I don\'t have friends', 'score': 4},
         ],
       },
     ];
@@ -57,18 +67,13 @@ class _QuizAppState extends State<QuizApp> {
         appBar: AppBar(
           title: Text("Quiz App"),
         ),
-        body: Column(children: [
-          Text(
-            (questions[_questionIndex]['questionText'] as String),
-          ),
-          ...(questions[_questionIndex]['answers'] as List<Map<String, Object>>)
-              .map((answer) {
-            return ElevatedButton(
-              child: Text(answer['text'] as String),
-              onPressed: _answerQuestion,
-            );
-          })
-        ]),
+        body: _questionIndex < _questions.length
+            ? Quiz(
+                answerQuestion: _answerQuestion,
+                questionIndex: _questionIndex,
+                questions: _questions,
+              )
+            : Results(score, _resetQuiz),
       ),
     );
   }
